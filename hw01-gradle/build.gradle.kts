@@ -5,7 +5,8 @@ plugins {
 }
 
 dependencies {
-    implementation ("com.google.guava:guava:33.3.1-jre")
+    implementation("ch.qos.logback:logback-classic")
+    implementation ("com.google.guava:guava")
 }
 
 tasks {

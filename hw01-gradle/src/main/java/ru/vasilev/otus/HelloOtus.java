@@ -1,11 +1,16 @@
 package ru.vasilev.otus;
 
 import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HelloOtus {
+public final class HelloOtus {
+
+    private HelloOtus() {}
+
+    private static final Logger logger = LoggerFactory.getLogger(HelloOtus.class);
 
     static void callSomeMethodFromGuava() {
         List<Integer> nums = new ArrayList<>();
@@ -19,7 +24,7 @@ public class HelloOtus {
     }
 
     private static void print(String title, List<Integer> nums) {
-        System.out.println(title);
-        System.out.println(nums);
+        logger.info(title);
+        logger.info("{}", nums);
     }
 }
