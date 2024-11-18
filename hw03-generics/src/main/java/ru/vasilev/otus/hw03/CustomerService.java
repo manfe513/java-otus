@@ -4,7 +4,7 @@ import java.util.*;
 
 public class CustomerService {
 
-    private final TreeMap<Customer, String> map = new TreeMap<>();
+    private final NavigableMap<Customer, String> map = new TreeMap<>();
 
     public Map.Entry<Customer, String> getSmallest() {
         Optional<Map.Entry<Customer, String>> optional = map.entrySet().stream()
