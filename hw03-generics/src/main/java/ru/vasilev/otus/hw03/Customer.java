@@ -1,6 +1,6 @@
 package ru.vasilev.otus.hw03;
 
-public class Customer implements Comparable<Customer> {
+public class Customer {
     private final long id;
     private String name;
     private long scores;
@@ -53,10 +53,5 @@ public class Customer implements Comparable<Customer> {
     @Override
     public int hashCode() {
         return Long.hashCode(id);
-    }
-
-    @Override
-    public int compareTo(Customer o) {
-        return Long.compare(scores, o.scores);
     }
 }

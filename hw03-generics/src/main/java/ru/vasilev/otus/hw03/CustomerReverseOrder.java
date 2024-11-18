@@ -4,7 +4,7 @@ import java.util.*;
 
 public class CustomerReverseOrder {
 
-    private final LinkedHashSet<Customer> sortedSet = new LinkedHashSet<>();
+    private final Deque<Customer> sortedSet = new LinkedList<>();
 
     public void add(Customer customer) {
         sortedSet.add(customer);
