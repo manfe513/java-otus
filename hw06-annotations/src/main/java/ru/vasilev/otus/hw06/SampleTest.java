@@ -3,6 +3,8 @@ package ru.vasilev.otus.hw06;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Function;
+
 public class SampleTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SampleTest.class);
@@ -15,13 +17,13 @@ public class SampleTest {
     @MyTest
     public void test1() {
         logger.info("test 1");
-        assert 2*2 == 4;
+        if (2*2 != 4) throw new ArithmeticException("wrong result");
     }
 
     @MyTest
     public void test2() {
         logger.info("test 2");
-        assert 2*2 == 5;
+        if( 2*2 != 5) throw new ArithmeticException("wrong result");
     }
 
     @MyAfter
