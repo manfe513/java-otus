@@ -1,4 +1,4 @@
-package ru.vasilev.otus.hw06;
+package ru.vasilev.otus.hw06.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,4 +7,4 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MyAfter {}
+public @interface MyTest {}

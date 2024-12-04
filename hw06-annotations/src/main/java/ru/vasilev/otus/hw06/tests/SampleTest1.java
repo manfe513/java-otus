@@ -1,13 +1,14 @@
-package ru.vasilev.otus.hw06;
+package ru.vasilev.otus.hw06.tests;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.vasilev.otus.hw06.annotation.MyAfter;
+import ru.vasilev.otus.hw06.annotation.MyBefore;
+import ru.vasilev.otus.hw06.annotation.MyTest;
 
-import java.util.function.Function;
+public class SampleTest1 {
 
-public class SampleTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(SampleTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(SampleTest1.class);
 
     @MyBefore
     public void myBefore() {
