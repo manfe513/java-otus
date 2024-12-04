@@ -8,7 +8,7 @@ public class SampleTest {
     private static final Logger logger = LoggerFactory.getLogger(SampleTest.class);
 
     @MyBefore
-    public void љљmyBefore() {
+    public void myBefore() {
         logger.info("myBefore");
     }
 
