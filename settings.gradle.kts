@@ -3,6 +3,7 @@ include(
     "hw01-gradle",
     "hw03-generics",
     "hw06-annotations",
+    "hw08-gc",
 )
 
 
