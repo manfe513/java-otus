@@ -29,9 +29,16 @@ public class TestRunner {
         List<Method> afterMethods = new ArrayList<>();
 
         Arrays.stream(methods).forEach(method -> {
-            if (isBefore(method)) beforeMethods.add(method);
-            else if (isTest(method)) testMethods.add(method);
-            else if (isAfter(method)) afterMethods.add(method);
+
+            if (isBefore(method)) {
+                beforeMethods.add(method);
+
+            } else if (isTest(method)) {
+                testMethods.add(method);
+
+            } else if (isAfter(method)) {
+                afterMethods.add(method);
+            }
         });
 
         AtomicInteger failedTests = new AtomicInteger();
