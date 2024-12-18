@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestRunner {
 
+    @SuppressWarnings("ReassignedVariable")
     public TestResult runTestsInClass(Class<?> clazz) {
         Object obj;
 
@@ -44,23 +45,37 @@ public class TestRunner {
         AtomicInteger failedTests = new AtomicInteger();
 
         testMethods.forEach(m -> {
-            try {
-                for (Method mBefore : beforeMethods) {
-                    mBefore.invoke(obj);
+            boolean beforeMethodSucceed = true;
+
+            for (Method mBefore : beforeMethods) {
+                if (!runMethod(mBefore, obj)) {
+                    beforeMethodSucceed = false;
+                    break;
                 }
+            }
 
-                m.invoke(obj);
-
-                for (Method mAfter : afterMethods) {
-                    mAfter.invoke(obj);
+            if (beforeMethodSucceed) {
+                if (!runMethod(m, obj)) {
+                    failedTests.incrementAndGet();
                 }
+            }
 
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                failedTests.getAndIncrement();
+            for (Method mAfter : afterMethods) {
+                runMethod(mAfter, obj);
             }
         });
 
-        return  new TestResult(testMethods.size(), failedTests.get());
+        return new TestResult(testMethods.size(), failedTests.get());
+    }
+
+    private boolean runMethod(Method m, Object o) {
+        try {
+            m.invoke(o);
+
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            return false;
+        }
+        return true;
     }
 
     private boolean isBefore(Method m) {
