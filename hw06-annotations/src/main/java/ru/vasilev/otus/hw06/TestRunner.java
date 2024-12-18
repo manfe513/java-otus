@@ -11,20 +11,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TestRunner {
 
     @SuppressWarnings("ReassignedVariable")
-    public TestResult runTestsInClass(Class<?> clazz) {
-        Object obj;
+    public TestResult runTestsInClass(Class<?> tClass) {
 
-        try {
-            obj = clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("unable to instantiate class" + clazz.getName());
-        }
-
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = tClass.getDeclaredMethods();
         List<Method> beforeMethods = new ArrayList<>();
         List<Method> testMethods = new ArrayList<>();
         List<Method> afterMethods = new ArrayList<>();
@@ -43,29 +37,40 @@ public class TestRunner {
         });
 
         AtomicInteger failedTests = new AtomicInteger();
+        AtomicReference<Object> obj = new AtomicReference<>();
 
         testMethods.forEach(m -> {
             boolean beforeMethodSucceed = true;
 
+            obj.set(createTestClassInstance(tClass));
+
             for (Method mBefore : beforeMethods) {
-                if (!runMethod(mBefore, obj)) {
+                if (!runMethod(mBefore, obj.get())) {
                     beforeMethodSucceed = false;
                     break;
                 }
             }
 
             if (beforeMethodSucceed) {
-                if (!runMethod(m, obj)) {
+                if (!runMethod(m, obj.get())) {
                     failedTests.incrementAndGet();
                 }
             }
 
             for (Method mAfter : afterMethods) {
-                runMethod(mAfter, obj);
+                runMethod(mAfter, obj.get());
             }
         });
 
-        return new TestResult(testMethods.size(), failedTests.get());
+        return new TestResult(testMethods.size(), failedTests.get(), obj.toString());
+    }
+
+    private Object createTestClassInstance(Class<?> tClass) {
+        try {
+            return tClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("unable to instantiate class" + tClass.getName());
+        }
     }
 
     private boolean runMethod(Method m, Object o) {

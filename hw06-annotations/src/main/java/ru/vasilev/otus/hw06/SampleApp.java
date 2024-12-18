@@ -2,7 +2,6 @@ package ru.vasilev.otus.hw06;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.vasilev.otus.hw06.tests.SampleTest1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class SampleApp {
             }
 
             TestResult result = new TestRunner().runTestsInClass(clazz);
-            logger.info("Test results for class " + clazz.getName() + ":");
+            logger.info("Test results for class instance - " + result.classInstanceIdentifier() + ":");
             logger.info("\t total: " + result.totalTests());
             logger.info("\t failed: " + result.failedTests());
 
