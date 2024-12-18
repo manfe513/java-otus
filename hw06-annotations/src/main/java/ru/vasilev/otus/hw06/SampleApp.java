@@ -21,7 +21,7 @@ public class SampleApp {
             }
 
             TestResult result = new TestRunner().runTestsInClass(clazz);
-            logger.info("Test results for class instance - " + result.classInstanceIdentifier() + ":");
+            logger.info("Test results for class " + clazz.getName() + ":");
             logger.info("\t total: " + result.totalTests());
             logger.info("\t failed: " + result.failedTests());
 

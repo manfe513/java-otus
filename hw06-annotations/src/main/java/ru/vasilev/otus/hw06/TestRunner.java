@@ -1,6 +1,8 @@
 package ru.vasilev.otus.hw06;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.vasilev.otus.hw06.annotation.MyAfter;
 import ru.vasilev.otus.hw06.annotation.MyBefore;
 import ru.vasilev.otus.hw06.annotation.MyTest;
@@ -11,9 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TestRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestRunner.class);
 
     @SuppressWarnings("ReassignedVariable")
     public TestResult runTestsInClass(Class<?> tClass) {
@@ -24,7 +27,6 @@ public class TestRunner {
         List<Method> afterMethods = new ArrayList<>();
 
         Arrays.stream(methods).forEach(method -> {
-
             if (isBefore(method)) {
                 beforeMethods.add(method);
 
@@ -37,32 +39,32 @@ public class TestRunner {
         });
 
         AtomicInteger failedTests = new AtomicInteger();
-        AtomicReference<Object> obj = new AtomicReference<>();
 
         testMethods.forEach(m -> {
             boolean beforeMethodSucceed = true;
 
-            obj.set(createTestClassInstance(tClass));
+            Object obj = createTestClassInstance(tClass);
+            logger.info("Class instance - {}", obj);
 
             for (Method mBefore : beforeMethods) {
-                if (!runMethod(mBefore, obj.get())) {
+                if (!runMethod(mBefore, obj)) {
                     beforeMethodSucceed = false;
                     break;
                 }
             }
 
             if (beforeMethodSucceed) {
-                if (!runMethod(m, obj.get())) {
+                if (!runMethod(m, obj)) {
                     failedTests.incrementAndGet();
                 }
             }
 
             for (Method mAfter : afterMethods) {
-                runMethod(mAfter, obj.get());
+                runMethod(mAfter, obj);
             }
         });
 
-        return new TestResult(testMethods.size(), failedTests.get(), obj.toString());
+        return new TestResult(testMethods.size(), failedTests.get());
     }
 
     private Object createTestClassInstance(Class<?> tClass) {
