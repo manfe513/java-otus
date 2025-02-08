@@ -4,6 +4,7 @@ include(
     "hw03-generics",
     "hw06-annotations",
     "hw08-gc",
+    "L10-byteCodes",
 )
 
 
