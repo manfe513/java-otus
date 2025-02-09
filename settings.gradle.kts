@@ -5,6 +5,7 @@ include(
     "hw06-annotations",
     "hw08-gc",
     "L10-byteCodes",
+    "L12-solid",
 )
 
 
