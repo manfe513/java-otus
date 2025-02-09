@@ -12,13 +12,13 @@ public class AutologClassImpl implements AutologInterface {
         return "AutologClassImpl {}";
     }
 
-    @Autologger
+    @Log
     @Override
     public void calc(int param) {
         logger.info(">> calling method calc, param: {}", param);
     }
 
-    @Autologger
+    @Log
     @Override
     public void calc(int param, String param2) {
         logger.info(">> calling method calc, params: {}, {}", param, param2);

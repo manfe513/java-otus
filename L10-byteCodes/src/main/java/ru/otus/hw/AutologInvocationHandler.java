@@ -12,15 +12,15 @@ import java.util.stream.Collectors;
 class AutologInvocationHandler implements InvocationHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AutologInvocationHandler.class);
-    private final AutologInterface myClass;
+    private final Object myClass;
     private final Set<String> loggableMethodSignatures;
 
     private StringBuilder sb = new StringBuilder();
 
-    AutologInvocationHandler(AutologInterface myClass) {
+    AutologInvocationHandler(Object myClass) {
         this.myClass = myClass;
         loggableMethodSignatures = Arrays.stream(this.myClass.getClass().getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(Autologger.class))
+                .filter(m -> m.isAnnotationPresent(Log.class))
                 .map(this::methodSignature)
                 .collect(Collectors.toSet());
     }
