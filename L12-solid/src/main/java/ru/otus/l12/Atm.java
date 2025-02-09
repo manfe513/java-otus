@@ -1,5 +1,6 @@
 package ru.otus.l12;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,52 +10,77 @@ public class Atm {
 
     private static final Logger logger = LoggerFactory.getLogger(Atm.class);
 
-    private Map<Integer, AtmCell> cells = new HashMap<>();
+    private final TreeSet<AtmCell> cells = new TreeSet<>(
+            Comparator.comparingInt(AtmCell::getNominal).reversed()
+    );
+
+    @Getter
     private int total = 0;
 
-    private final BanknoteHolder banknoteHolder = new BanknoteHolder();
+    public Atm(Set<Integer> nominals) {
 
+        nominals.forEach(n -> {
+            var newCell = AtmCell.builder()
+                    .nominal(n)
+                    .amount(0)
+                    .build();
+
+            cells.add(newCell);
+        });
+    }
 
     public void add(Banknote... banknotes) {
 
         for (Banknote b : banknotes) {
-            AtmCell cell = cells.get(b.amount());
-            if (cell == null) {
-                throw new IllegalArgumentException("Недопустимый номинал - %d".formatted(b.amount()));
-            }
-
-            cell.amount++;
-            total += b.amount();
+            findCellForBanknote(b).amount++;
+            total += b.nominal();
         }
     }
 
-    public int getTotal() {
-        return cells.values().stream()
-                .mapToInt(cell -> cell.amount * cell.nominal)
-                .sum();
+    private AtmCell findCellForBanknote(Banknote b) {
+        return cells.stream()
+                .filter(cell -> cell.nominal == b.nominal())
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Недопустимый номинал: %d".formatted(b.nominal())
+                        )
+                );
     }
 
-    public List<Banknote> get(int amount) {
+    public List<Integer> withdraw(int amount) {
+        logger.info(">> Запрос на вывод суммы: {}", amount);
         if (amount > getTotal()) throw new IllegalArgumentException("Запрошено %d, всего %d".formatted(amount, total));
 
         int sum = 0;
-        List<Banknote> takenBanknotes = new ArrayList<>();
-//
-//        for (Banknote b : banknotes10) {
-//            // если нужно 15, то 2 банкноты по 10 = 20, т.е. много => переходим к меньшим номиналам
-//            if ((sum + b.amount()) > amount) continue;
-//
-//            sum += b.amount();
-//            takenBanknotes.add(b);
-//
-//            if (sum == amount) {
-//                //remove banknotes and return taken
-//                break;
-//            }
-//        }
-//
-//        banknoteHolder.remove(takenBanknotes);
-//
-//        return takenBanknotes;
+        List<Integer> takenNominals = new ArrayList<>();
+
+        for (AtmCell cell : cells) {
+            // если нужно 15, то 2 банкноты по 10 = 20, т.е. много => переходим к меньшим номиналам
+            if ((sum + cell.nominal) > amount) continue;
+
+            sum += cell.nominal;
+            cell.amount--;
+            takenNominals.add(cell.nominal);
+
+            if (sum == amount) {
+                printTakenNominals(takenNominals);
+                break;
+            }
+        }
+
+        return takenNominals;
+    }
+
+    private void printTakenNominals(List<Integer> takenNominals) {
+        logger.info(">> Деньги выданы купюрами:");
+
+        for (int nominal : takenNominals) {
+            logger.info("- {}", nominal);
+        }
+    }
+
+    public void reset() {
+        cells.forEach(c -> c.amount = 0);
     }
 }
