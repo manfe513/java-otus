@@ -2,6 +2,7 @@ package ru.otus.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
+import ru.otus.processor.ProcessorEvenSecond;
 import ru.otus.processor.ProcessorExchangeFields;
 
 class ComplexProcessorTest {
@@ -104,9 +106,10 @@ class ComplexProcessorTest {
         var processorExchangeFields = new ProcessorExchangeFields();
         var complexProcessor = new ComplexProcessor(List.of(processorExchangeFields), ex -> {});
 
+        // when
         Message handledMsg = complexProcessor.handle(message);
 
-        // проверка замены значений
+        // then
         assertThat(handledMsg.getField11()).isEqualTo("field12");
         assertThat(handledMsg.getField12()).isEqualTo("field11");
     }
@@ -114,7 +117,27 @@ class ComplexProcessorTest {
     @Test
     @DisplayName("Проверка обработчика: бросить исключение в чётную секунду")
     void throwsExceptionOnEvenSecond() {
-        asdad
+        // given
+        var msg = new Message.Builder(1L).build();
+
+        var secondProvider = new ProcessorEvenSecond.SecondProvider() {
+            @Override
+            public long getCurrentSecond() {
+
+                return 4;
+            }
+        };
+
+        var processorEvenSecEx = new ProcessorEvenSecond(secondProvider);
+        var complexProcessor = new ComplexProcessor(
+                List.of(processorEvenSecEx),
+                ex -> { throw new TestException(ex.getMessage()); }
+        );
+
+        // when
+        assertThatThrownBy(() -> complexProcessor.handle(msg))
+                .isInstanceOf(TestException.class)
+                        .hasMessage("Выполнение в чётную секунду запрещено");
     }
 
     private static class TestException extends RuntimeException {

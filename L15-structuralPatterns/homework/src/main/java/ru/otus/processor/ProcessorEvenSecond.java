@@ -2,8 +2,6 @@ package ru.otus.processor;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import ru.otus.model.Message;
 
@@ -12,16 +10,16 @@ import ru.otus.model.Message;
 //         Секунда должна определяьться во время выполнения.
 //         Тест - важная часть задания
 // Обязательно посмотрите пример к паттерну Мементо!
-public class ProcessorEvenSecException implements Processor {
+public class ProcessorEvenSecond implements Processor {
 
-    private SecondProdiver secondProdiver;
+    private final SecondProvider secondProdiver;
 
-    ProcessorEvenSecException(SecondProdiver secondProdiver) {
+    public ProcessorEvenSecond(SecondProvider secondProdiver) {
         this.secondProdiver = secondProdiver;
     }
 
-    private ProcessorEvenSecException() {
-        this.secondProdiver = new SecondProdiver() {};
+    private ProcessorEvenSecond() {
+        this.secondProdiver = new SecondProvider() {};
     }
 
     @Override
@@ -33,13 +31,13 @@ public class ProcessorEvenSecException implements Processor {
         } else return message;
     }
 
-    interface SecondProdiver {
+    public interface SecondProvider {
         default long getCurrentSecond() {
             return LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         }
     }
 
-    static class EvenSecondException extends IllegalStateException {
+    public static class EvenSecondException extends IllegalStateException {
 
         EvenSecondException() {
             super("Выполнение в чётную секунду запрещено");
