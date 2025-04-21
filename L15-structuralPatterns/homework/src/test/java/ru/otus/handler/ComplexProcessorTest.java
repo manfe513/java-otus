@@ -10,11 +10,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
+import ru.otus.processor.ProcessorExchangeFields;
 
 class ComplexProcessorTest {
 
@@ -88,6 +90,31 @@ class ComplexProcessorTest {
 
         // then
         verify(listener, times(1)).onUpdated(message);
+    }
+
+    @Test
+    @DisplayName("Проверка обработчика: поменять местами поля 11 и 12")
+    void testFieldsExchange() {
+        // given
+        var message = new Message.Builder(1L)
+                .field11("field11")
+                .field12("field12")
+                .build();
+
+        var processorExchangeFields = new ProcessorExchangeFields();
+        var complexProcessor = new ComplexProcessor(List.of(processorExchangeFields), ex -> {});
+
+        Message handledMsg = complexProcessor.handle(message);
+
+        // проверка замены значений
+        assertThat(handledMsg.getField11()).isEqualTo("field12");
+        assertThat(handledMsg.getField12()).isEqualTo("field11");
+    }
+
+    @Test
+    @DisplayName("Проверка обработчика: бросить исключение в чётную секунду")
+    void throwsExceptionOnEvenSecond() {
+        asdad
     }
 
     private static class TestException extends RuntimeException {
