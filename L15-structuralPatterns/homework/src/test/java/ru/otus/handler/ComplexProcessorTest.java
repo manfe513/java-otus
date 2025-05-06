@@ -3,6 +3,7 @@ package ru.otus.handler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -14,6 +15,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
@@ -114,17 +118,21 @@ class ComplexProcessorTest {
         assertThat(handledMsg.getField12()).isEqualTo("field11");
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({
+            "4, true",
+            "3, false"
+    })
     @DisplayName("Проверка обработчика: бросить исключение в чётную секунду")
-    void throwsExceptionOnEvenSecond() {
+    void throwsExceptionOnEvenSecond(int second, Boolean exceptionExpected) {
         // given
         var msg = new Message.Builder(1L).build();
 
-        var secondProvider = new ProcessorEvenSecond.SecondProvider() {
+        var secondProvider = new ProcessorEvenSecond.TimeProvider() {
             @Override
             public long getCurrentSecond() {
 
-                return 4;
+                return second;
             }
         };
 
@@ -135,9 +143,13 @@ class ComplexProcessorTest {
         );
 
         // when
-        assertThatThrownBy(() -> complexProcessor.handle(msg))
-                .isInstanceOf(TestException.class)
-                        .hasMessage("Выполнение в чётную секунду запрещено");
+        if (exceptionExpected) {
+            assertThatThrownBy(() -> complexProcessor.handle(msg))
+                    .isInstanceOf(TestException.class)
+                    .hasMessage("Выполнение в чётную секунду запрещено");
+        } else {
+            assertDoesNotThrow(() -> complexProcessor.handle(msg));
+        }
     }
 
     private static class TestException extends RuntimeException {

@@ -12,14 +12,14 @@ import ru.otus.model.Message;
 // Обязательно посмотрите пример к паттерну Мементо!
 public class ProcessorEvenSecond implements Processor {
 
-    private final SecondProvider secondProdiver;
+    private final TimeProvider secondProdiver;
 
-    public ProcessorEvenSecond(SecondProvider secondProdiver) {
+    public ProcessorEvenSecond(TimeProvider secondProdiver) {
         this.secondProdiver = secondProdiver;
     }
 
     private ProcessorEvenSecond() {
-        this.secondProdiver = new SecondProvider() {};
+        this.secondProdiver = new TimeProvider() {};
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ProcessorEvenSecond implements Processor {
         } else return message;
     }
 
-    public interface SecondProvider {
+    public interface TimeProvider {
         default long getCurrentSecond() {
             return LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         }
