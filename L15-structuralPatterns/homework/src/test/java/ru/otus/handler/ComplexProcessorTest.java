@@ -2,6 +2,8 @@ package ru.otus.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -10,11 +12,17 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
+import ru.otus.processor.ProcessorEvenSecond;
+import ru.otus.processor.ProcessorExchangeFields;
 
 class ComplexProcessorTest {
 
@@ -88,6 +96,60 @@ class ComplexProcessorTest {
 
         // then
         verify(listener, times(1)).onUpdated(message);
+    }
+
+    @Test
+    @DisplayName("Проверка обработчика: поменять местами поля 11 и 12")
+    void testFieldsExchange() {
+        // given
+        var message = new Message.Builder(1L)
+                .field11("field11")
+                .field12("field12")
+                .build();
+
+        var processorExchangeFields = new ProcessorExchangeFields();
+        var complexProcessor = new ComplexProcessor(List.of(processorExchangeFields), ex -> {});
+
+        // when
+        Message handledMsg = complexProcessor.handle(message);
+
+        // then
+        assertThat(handledMsg.getField11()).isEqualTo("field12");
+        assertThat(handledMsg.getField12()).isEqualTo("field11");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "4, true",
+            "3, false"
+    })
+    @DisplayName("Проверка обработчика: бросить исключение в чётную секунду")
+    void throwsExceptionOnEvenSecond(int second, Boolean exceptionExpected) {
+        // given
+        var msg = new Message.Builder(1L).build();
+
+        var secondProvider = new ProcessorEvenSecond.TimeProvider() {
+            @Override
+            public long getCurrentSecond() {
+
+                return second;
+            }
+        };
+
+        var processorEvenSecEx = new ProcessorEvenSecond(secondProvider);
+        var complexProcessor = new ComplexProcessor(
+                List.of(processorEvenSecEx),
+                ex -> { throw new TestException(ex.getMessage()); }
+        );
+
+        // when
+        if (exceptionExpected) {
+            assertThatThrownBy(() -> complexProcessor.handle(msg))
+                    .isInstanceOf(TestException.class)
+                    .hasMessage("Выполнение в чётную секунду запрещено");
+        } else {
+            assertDoesNotThrow(() -> complexProcessor.handle(msg));
+        }
     }
 
     private static class TestException extends RuntimeException {
