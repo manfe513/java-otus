@@ -30,7 +30,7 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
     @Override
     public String getInsertSql() {
 
-        var fields = meta.getAllFields().stream()
+        var fields = meta.getFieldsWithoutId().stream()
                 .map(Field::getName)
                 .toList();
 

@@ -36,7 +36,14 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     @Override
     public Optional<T> findById(Connection connection, long id) {
 
-        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), this::mapEntity);
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
+            try {
+                rs.next();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return mapEntity(rs);
+        });
     }
 
     private T mapEntity(ResultSet rs) {
@@ -68,9 +75,9 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             List<T> items = new ArrayList<>();
 
             try {
-                do {
+                while (rs.next()) {
                     mapEntity(rs);
-                } while (rs.next());
+                }
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -82,7 +89,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public long insert(Connection connection, T client) {
-        List<Object> values = fieldsToValues(entityClassMetaData.getAllFields(), client);
+        List<Object> values = fieldsToValues(entityClassMetaData.getFieldsWithoutId(), client);
 
         return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(), values);
     }
