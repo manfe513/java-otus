@@ -37,7 +37,8 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
     public Field getIdField() {
         return fields.stream()
                 .filter(f -> f.isAnnotationPresent(Id.class))
-                .findFirst().orElseThrow();
+                .findFirst()
+                .orElseThrow();
     }
 
     @Override
