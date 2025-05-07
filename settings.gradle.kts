@@ -8,6 +8,8 @@ include(
     "L12-solid",
     "L15-structuralPatterns:demo",
     "L16-io:homework",
+    "L18-jdbc:demo",
+    "L18-jdbc:homework",
 )
 
 
