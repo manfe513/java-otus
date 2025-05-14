@@ -47,6 +47,19 @@ public class HWCacheDemo {
     }
 
     private void demoWithHibernate() {
+        HwCache<Long, Client> cache = new MyCache<>();
+
+        // пример, когда Idea предлагает упростить код, при этом может появиться "спец"-эффект
+        @SuppressWarnings("java:S1604")
+        HwListener<Long, Client> listener = new HwListener<Long, Client>() {
+            @Override
+            public void notify(Long key, Client value, String action) {
+                logger.info("key:{}, value:{}, action: {}", key, value, action);
+            }
+        };
+
+        cache.addListener(listener);
+
         var configuration = new Configuration().configure(HIBERNATE_CFG_FILE);
 
         var dbUrl = configuration.getProperty("hibernate.connection.url");
@@ -62,7 +75,7 @@ public class HWCacheDemo {
         ///
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
         ///
-        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
+        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate, cache);
         dbServiceClient.saveClient(new Client("dbServiceFirst"));
 
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
