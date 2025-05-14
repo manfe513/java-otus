@@ -1,5 +1,6 @@
 package ru.otus.cachehw;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,7 +10,7 @@ public class MyCache<K, V> implements HwCache<K, V> {
 
     private final Map<K, V> cache = new WeakHashMap<>();
 
-    private final Set<HwListener<K,V>> listeners = new HashSet<>();
+    private final Set<HwListener<K,V>> listeners = Collections.newSetFromMap(new WeakHashMap<>());
 
     @Override
     public void put(K key, V value) {
