@@ -1,7 +1,6 @@
 package ru.otus.core.repository;
 
 import java.util.Arrays;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
