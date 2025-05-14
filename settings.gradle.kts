@@ -12,6 +12,7 @@ include(
     "L18-jdbc:homework",
     "L21-jpql:class-demo",
     "L21-jpql:homework-template",
+    "L22-cache",
 )
 
 
