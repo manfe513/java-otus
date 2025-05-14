@@ -10,6 +10,8 @@ include(
     "L16-io:homework",
     "L18-jdbc:demo",
     "L18-jdbc:homework",
+    "L21-jpql:class-demo",
+    "L21-jpql:homework-template",
 )
 
 
