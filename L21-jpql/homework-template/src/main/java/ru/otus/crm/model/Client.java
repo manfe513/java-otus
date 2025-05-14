@@ -1,8 +1,5 @@
 package ru.otus.crm.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +11,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,12 +54,12 @@ public class Client implements Cloneable {
         this.id = id;
         this.name = name;
 
-        if(address != null) {
+        if (address != null) {
             this.address = address.clone();
         }
         this.phones = phones;
 
-        if(phones != null) {
+        if (phones != null) {
             List<Phone> phonesCopy = new ArrayList<>();
             for (Phone p : phones) {
 
