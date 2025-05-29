@@ -16,6 +16,8 @@ include(
     "L25-di:class-demo",
     "L25-di:homework",
     "L31-executors",
+    "L32-concurrentCollections:ConcurrentCollections",
+    "L32-concurrentCollections:QueueDemo",
 )
 
 
