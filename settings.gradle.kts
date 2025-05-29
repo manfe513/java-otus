@@ -13,6 +13,8 @@ include(
     "L21-jpql:class-demo",
     "L21-jpql:homework-template",
     "L22-cache",
+    "L25-di:class-demo",
+    "L25-di:homework-template",
     "L31-executors",
 )
 
