@@ -1,6 +1,6 @@
 package ru.otus.cachehw;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -9,26 +9,28 @@ public class MyCache<K, V> implements HwCache<K, V> {
 
     private final Map<K, V> cache = new WeakHashMap<>();
 
-    private final Set<HwListener<K, V>> listeners = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<HwListener<K, V>> listeners = new HashSet<>();
 
     @Override
     public void put(K key, V value) {
         cache.put(key, value);
 
-        listeners.forEach(l -> l.notify(key, value, "put"));
+        notifyAllListeners(key, value, "put");
     }
 
     @Override
     public void remove(K key) {
         var value = cache.remove(key);
 
-        listeners.forEach(l -> l.notify(key, value, "remove"));
+        notifyAllListeners(key, value, "remove");
     }
 
     @Override
     public V get(K key) {
         var value = cache.get(key);
-        listeners.forEach(l -> l.notify(key, value, "get"));
+
+        notifyAllListeners(key, value, "get");
+
         return value;
     }
 
@@ -40,5 +42,15 @@ public class MyCache<K, V> implements HwCache<K, V> {
     @Override
     public void removeListener(HwListener<K, V> listener) {
         listeners.remove(listener);
+    }
+
+    private void notifyAllListeners(K key, V value, String action) {
+        listeners.forEach(l -> {
+            try {
+                l.notify(key, value, action);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

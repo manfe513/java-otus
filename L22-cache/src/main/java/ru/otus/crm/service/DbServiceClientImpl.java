@@ -70,7 +70,10 @@ public class DbServiceClientImpl implements DBServiceClient {
     public List<Client> findAll() {
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientList = clientDataTemplate.findAll(session);
+
+            clientList.forEach(c -> cache.put(c.getId(), c));
             log.info("clientList:{}", clientList);
+
             return clientList;
         });
     }
