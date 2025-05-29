@@ -25,10 +25,6 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     private List<SensorData> drainBucket = new ArrayList<>();
 
-    private Comparator<SensorData> comparator = Comparator.comparing(SensorData::getMeasurementTime);
-
-    ;
-
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
 
         this.bufferSize = bufferSize;
