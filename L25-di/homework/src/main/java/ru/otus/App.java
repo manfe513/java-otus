@@ -24,7 +24,8 @@ public class App {
 
     public static void main(String[] args) {
         // Опциональные варианты
-        // AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig1.class, AppConfig2.class);
+        //         AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig1.class,
+        // AppConfig2.class);
 
         // Тут можно использовать библиотеку Reflections (см. зависимости)
         // AppComponentsContainer container = new AppComponentsContainerImpl("ru.otus.config");
