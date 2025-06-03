@@ -10,7 +10,7 @@ public class NumsClient {
     private static final int SERVER_PORT = 8190;
 
     private static final NumsClientStreamObserver streamObserver = new NumsClientStreamObserver();
-    private static volatile long lastServerValue = 0L;
+    private static long lastServerValue = 0L;
 
     private static final long NEXT_NUM_DELAY_MILLIS = 1_000;
 

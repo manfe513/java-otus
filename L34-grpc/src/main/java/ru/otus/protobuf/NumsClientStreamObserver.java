@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public class NumsClientStreamObserver implements StreamObserver<GetNumResponse> {
     private static final Logger logger = LoggerFactory.getLogger(NumsClientStreamObserver.class);
-    private volatile long lastValue;
+    private long lastValue;
 
     @Override
     public void onNext(GetNumResponse numberResponse) {
