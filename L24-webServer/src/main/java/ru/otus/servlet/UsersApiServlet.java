@@ -5,6 +5,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import ru.otus.dao.UserDao;
 import ru.otus.model.User;
@@ -29,6 +30,26 @@ public class UsersApiServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream out = response.getOutputStream();
         out.print(gson.toJson(user));
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+
+        User user = gson.fromJson(sb.toString(), User.class);
+
+        var createdUsr = userDao.createUser(user);
+
+        ServletOutputStream out = response.getOutputStream();
+        out.print(gson.toJson(createdUsr.get()));
     }
 
     private long extractIdFromRequest(HttpServletRequest request) {
