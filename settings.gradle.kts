@@ -18,6 +18,8 @@ include(
     "L31-executors",
     "L32-concurrentCollections:ConcurrentCollections",
     "L32-concurrentCollections:QueueDemo",
+    "L38-webflux-chat:client-service",
+    "L38-webflux-chat:datastore-service",
 )
 
 
