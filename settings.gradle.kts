@@ -18,6 +18,7 @@ include(
     "L31-executors",
     "L32-concurrentCollections:ConcurrentCollections",
     "L32-concurrentCollections:QueueDemo",
+    "L34-grpc",
 )
 
 
