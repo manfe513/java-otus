@@ -26,6 +26,8 @@ public class MessageController {
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
 
+    private final String SECRET_ROOM_ID = "1408";
+
     public MessageController(WebClient datastoreClient, SimpMessagingTemplate template) {
         this.datastoreClient = datastoreClient;
         this.template = template;
@@ -34,10 +36,20 @@ public class MessageController {
     @MessageMapping("/message.{roomId}")
     public void getMessage(@DestinationVariable("roomId") String roomId, Message message) {
         logger.info("get message:{}, roomId:{}", message, roomId);
-        saveMessage(roomId, message).subscribe(msgId -> logger.info("message send id:{}", msgId));
 
-        template.convertAndSend(
-                String.format("%s%s", TOPIC_TEMPLATE, roomId), new Message(HtmlUtils.htmlEscape(message.messageStr())));
+        switch (roomId) {
+            case SECRET_ROOM_ID -> logger.info("нельзя писать сообщения в комнату %s".formatted(roomId));
+            default -> {
+                saveMessage(roomId, message).subscribe(msgId -> logger.info("message send id:{}", msgId));
+
+                template.convertAndSend(
+                        String.format("%s%s", TOPIC_TEMPLATE, roomId),
+                        new Message(HtmlUtils.htmlEscape(message.messageStr())));
+                template.convertAndSend(
+                        String.format("%s%s", TOPIC_TEMPLATE, SECRET_ROOM_ID),
+                        new Message(HtmlUtils.htmlEscape(message.messageStr())));
+            }
+        }
     }
 
     @EventListener
@@ -59,9 +71,18 @@ public class MessageController {
         }
         logger.info("subscription for:{}, roomId:{}, user:{}", simpDestination, roomId, principal.getName());
         // /user/f6532733-51db-4d0e-bd00-1267dddc7b21/topic/response.1
-        getMessagesByRoomId(roomId)
+
+        getMessagesFlux(roomId)
                 .doOnError(ex -> logger.error("getting messages for roomId:{} failed", roomId, ex))
                 .subscribe(message -> template.convertAndSendToUser(principal.getName(), simpDestination, message));
+    }
+
+    private Flux<Message> getMessagesFlux(final long roomId) {
+        if (String.valueOf(roomId).equals(SECRET_ROOM_ID)) {
+            return getAllMessages();
+        } else {
+            return getMessagesByRoomId(roomId);
+        }
     }
 
     private long parseRoomId(String simpDestination) {
@@ -87,6 +108,20 @@ public class MessageController {
         return datastoreClient
                 .get()
                 .uri(String.format("/msg/%s", roomId))
+                .accept(MediaType.APPLICATION_NDJSON)
+                .exchangeToFlux(response -> {
+                    if (response.statusCode().equals(HttpStatus.OK)) {
+                        return response.bodyToFlux(Message.class);
+                    } else {
+                        return response.createException().flatMapMany(Mono::error);
+                    }
+                });
+    }
+
+    private Flux<Message> getAllMessages() {
+        return datastoreClient
+                .get()
+                .uri("/msg/all")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchangeToFlux(response -> {
                     if (response.statusCode().equals(HttpStatus.OK)) {
