@@ -13,6 +13,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -81,5 +82,15 @@ public class Client implements Cloneable {
     public String toString() {
         return "Client{" + "id=" + id + ", name='" + name + '\'' + ", phones='" + phones + '\'' + ", address='"
                 + address + '\'' + '}';
+    }
+
+    public String addressText() {
+        if (getAddress() == null) return "null";
+        else return getAddress().getStreet();
+    }
+
+    public String phonesText() {
+        if (getPhones() == null) return "null";
+        else return getPhones().stream().map(Phone::getNumber).collect(Collectors.joining(", "));
     }
 }

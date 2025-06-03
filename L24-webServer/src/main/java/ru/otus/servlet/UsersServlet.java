@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import ru.otus.dao.UserDao;
-import ru.otus.model.User;
 import ru.otus.services.TemplateProcessor;
 
 @SuppressWarnings({"java:S1989"})
@@ -34,9 +33,6 @@ public class UsersServlet extends HttpServlet {
 
         if (randomUserOpt.isPresent()) {
             paramsMap.put(TEMPLATE_ATTR_RANDOM_USER, randomUserOpt.get());
-        } else {
-            User sampleUser = new User(1L, "Пользователь1", "user1", DEFAULT_PASSWORD);
-            paramsMap.put(TEMPLATE_ATTR_RANDOM_USER, sampleUser);
         }
 
         response.setContentType("text/html");

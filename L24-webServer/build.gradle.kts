@@ -11,9 +11,6 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-util")
     implementation("org.freemarker:freemarker")
 
-    implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-database-postgresql")
-
     implementation("org.postgresql:postgresql")
 
     implementation("com.h2database:h2")
