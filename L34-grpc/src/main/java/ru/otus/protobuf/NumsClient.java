@@ -22,7 +22,7 @@ public class NumsClient {
         long currentValue = 0;
         for (int i = 0; i <= 50; i++) {
             try {
-                currentValue = calculateCurrentValue(currentValue);
+                currentValue = calculateNextValue(currentValue);
 
                 logger.info("currentValue: {}", currentValue);
                 Thread.sleep(NEXT_NUM_DELAY_MILLIS);
@@ -35,7 +35,7 @@ public class NumsClient {
         }
     }
 
-    private static long calculateCurrentValue(final long currentValue) {
+    private static long calculateNextValue(final long currentValue) {
         long serverValue = streamObserver.getLastValue();
         logger.info("serverValue: {}", currentValue);
 
