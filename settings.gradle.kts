@@ -20,6 +20,7 @@ include(
     "L32-concurrentCollections:QueueDemo",
     "L38-webflux-chat:client-service",
     "L38-webflux-chat:datastore-service",
+    "L24-webServer",
 )
 
 
