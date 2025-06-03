@@ -3,7 +3,7 @@ package ru.otus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.hibernate.cfg.Configuration;
-import ru.otus.dao.InMemoryUserDao;
+import ru.otus.dao.DbUserDao;
 import ru.otus.dao.UserDao;
 import ru.otus.from_orm_hw.core.repository.DataTemplateHibernate;
 import ru.otus.from_orm_hw.core.repository.HibernateUtils;
@@ -14,6 +14,7 @@ import ru.otus.from_orm_hw.crm.model.Address;
 import ru.otus.from_orm_hw.crm.model.Client;
 import ru.otus.from_orm_hw.crm.model.Phone;
 import ru.otus.from_orm_hw.crm.service.DbServiceClientImpl;
+import ru.otus.model.User;
 import ru.otus.server.UsersWebServer;
 import ru.otus.server.UsersWebServerSimple;
 import ru.otus.services.TemplateProcessor;
@@ -46,7 +47,8 @@ public class WebServerSimpleDemo {
         var clients = dbServiceClient.findAll();
         clients.forEach(c -> System.out.println(c));
 
-        UserDao userDao = new InMemoryUserDao();
+        //        UserDao userDao = new InMemoryUserDao();
+        UserDao userDao = new DbUserDao(tm, new DataTemplateHibernate<>(User.class));
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
 
@@ -66,7 +68,7 @@ public class WebServerSimpleDemo {
         new MigrationsExecutorFlyway(dbUrl, dbUserName, dbPassword).executeMigrations();
 
         var sessionFactory =
-                HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
+                HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class, User.class);
 
         return new TransactionManagerHibernate(sessionFactory);
     }

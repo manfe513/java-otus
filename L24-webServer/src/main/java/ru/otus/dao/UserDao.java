@@ -10,4 +10,6 @@ public interface UserDao {
     Optional<User> findRandomUser();
 
     Optional<User> findByLogin(String login);
+
+    Optional<User> createUser(User user);
 }
