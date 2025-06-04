@@ -21,6 +21,7 @@ include(
     "L38-webflux-chat:client-service",
     "L38-webflux-chat:datastore-service",
     "L24-webServer",
+    "L28-springDataJdbc",
 )
 
 
