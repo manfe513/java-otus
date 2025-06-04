@@ -38,4 +38,11 @@ public class InMemoryUserDao implements UserDao {
     public Optional<User> findByLogin(String login) {
         return users.values().stream().filter(v -> v.getLogin().equals(login)).findFirst();
     }
+
+    @Override
+    public Optional<User> createUser(final User user) {
+        long nextId = users.keySet().stream().max(Long::compare).get() + 1;
+
+        return Optional.of(users.put(nextId, user));
+    }
 }

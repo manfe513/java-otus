@@ -7,9 +7,15 @@ import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.util.resource.PathResourceFactory;
 import org.eclipse.jetty.util.resource.Resource;
-import ru.otus.dao.InMemoryUserDao;
+import ru.otus.dao.ClientDao;
+import ru.otus.dao.DbClientDao;
+import ru.otus.dao.DbUserDao;
 import ru.otus.dao.UserDao;
+import ru.otus.from_orm_hw.core.repository.DataTemplateHibernate;
+import ru.otus.from_orm_hw.core.sessionmanager.TransactionManager;
+import ru.otus.from_orm_hw.crm.model.Client;
 import ru.otus.helpers.FileSystemHelper;
+import ru.otus.model.User;
 import ru.otus.server.UsersWebServer;
 import ru.otus.server.UsersWebServerWithBasicSecurity;
 import ru.otus.services.TemplateProcessor;
@@ -34,7 +40,11 @@ public class WebServerWithBasicSecurityDemo {
     private static final String REALM_NAME = "AnyRealm";
 
     public static void main(String[] args) throws Exception {
-        UserDao userDao = new InMemoryUserDao();
+        TransactionManager tm = TransactionManagerFactory.initTransactionManager();
+
+        UserDao userDao = new DbUserDao(tm, new DataTemplateHibernate<>(User.class));
+        ClientDao clientDao = new DbClientDao(tm, new DataTemplateHibernate<>(Client.class));
+
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
 
@@ -46,8 +56,8 @@ public class WebServerWithBasicSecurityDemo {
         LoginService loginService = new HashLoginService(REALM_NAME, configResource);
         // LoginService loginService = new InMemoryLoginServiceImpl(userDao); // NOSONAR
 
-        UsersWebServer usersWebServer =
-                new UsersWebServerWithBasicSecurity(WEB_SERVER_PORT, loginService, userDao, gson, templateProcessor);
+        UsersWebServer usersWebServer = new UsersWebServerWithBasicSecurity(
+                WEB_SERVER_PORT, loginService, userDao, clientDao, gson, templateProcessor);
 
         usersWebServer.start();
         usersWebServer.join();

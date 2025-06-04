@@ -2,8 +2,14 @@ package ru.otus;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import ru.otus.dao.InMemoryUserDao;
+import ru.otus.dao.ClientDao;
+import ru.otus.dao.DbClientDao;
+import ru.otus.dao.DbUserDao;
 import ru.otus.dao.UserDao;
+import ru.otus.from_orm_hw.core.repository.DataTemplateHibernate;
+import ru.otus.from_orm_hw.core.sessionmanager.TransactionManager;
+import ru.otus.from_orm_hw.crm.model.Client;
+import ru.otus.model.User;
 import ru.otus.server.UsersWebServer;
 import ru.otus.server.UsersWebServerWithFilterBasedSecurity;
 import ru.otus.services.TemplateProcessor;
@@ -28,13 +34,17 @@ public class WebServerWithFilterBasedSecurityDemo {
     private static final String TEMPLATES_DIR = "/templates/";
 
     public static void main(String[] args) throws Exception {
-        UserDao userDao = new InMemoryUserDao();
+        TransactionManager tm = TransactionManagerFactory.initTransactionManager();
+
+        UserDao userDao = new DbUserDao(tm, new DataTemplateHibernate<>(User.class));
+        ClientDao clientDao = new DbClientDao(tm, new DataTemplateHibernate<>(Client.class));
+
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
         UserAuthService authService = new UserAuthServiceImpl(userDao);
 
         UsersWebServer usersWebServer = new UsersWebServerWithFilterBasedSecurity(
-                WEB_SERVER_PORT, authService, userDao, gson, templateProcessor);
+                WEB_SERVER_PORT, authService, userDao, clientDao, gson, templateProcessor);
 
         usersWebServer.start();
         usersWebServer.join();
