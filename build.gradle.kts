@@ -42,6 +42,7 @@ allprojects {
 
     val jetty: String by project
     val freemarker: String by project
+    val thymeleaf: String by project
 
     val reflections: String by project
 
@@ -79,6 +80,7 @@ allprojects {
             dependency("org.eclipse.jetty:jetty-io:$jetty")
             dependency("org.eclipse.jetty:jetty-util:$jetty")
             dependency("org.freemarker:freemarker:$freemarker")
+            dependency("org.thymeleaf:thymeleaf:$thymeleaf")
 
             dependency("org.reflections:reflections:$reflections")
 
