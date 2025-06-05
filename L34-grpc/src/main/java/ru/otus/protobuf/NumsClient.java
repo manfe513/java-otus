@@ -1,6 +1,7 @@
 package ru.otus.protobuf;
 
 import io.grpc.ManagedChannelBuilder;
+import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ public class NumsClient {
     private static final int SERVER_PORT = 8190;
 
     private static final NumsClientStreamObserver streamObserver = new NumsClientStreamObserver();
-    private static long lastServerValue = 0L;
+    private static AtomicLong lastServerValue = new AtomicLong();
 
     private static final long NEXT_NUM_DELAY_MILLIS = 1_000;
 
@@ -39,16 +40,13 @@ public class NumsClient {
         long serverValue = streamObserver.getLastValue();
         logger.info("serverValue: {}", currentValue);
 
-        long nextVal = currentValue;
+        long previousServerValue = lastServerValue.getAndSet(serverValue);
 
-        if (serverValue != lastServerValue && serverValue > 0) {
-            lastServerValue = serverValue;
-            nextVal += serverValue + 1;
+        if (serverValue != previousServerValue) {
+            return currentValue + serverValue + 1;
         } else {
-            nextVal += 1;
+            return currentValue + 1;
         }
-
-        return nextVal;
     }
 
     private static void startObservingServerValues() {

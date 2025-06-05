@@ -10,9 +10,7 @@ public class NumsClientStreamObserver implements StreamObserver<GetNumResponse> 
 
     @Override
     public void onNext(GetNumResponse numberResponse) {
-        synchronized (this) {
-            lastValue = numberResponse.getNum();
-        }
+        lastValue = numberResponse.getNum();
         logger.info("new value: {}", lastValue);
     }
 
